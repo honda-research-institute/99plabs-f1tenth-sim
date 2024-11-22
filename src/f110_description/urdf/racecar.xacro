@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+
+<!-- A simple model of the racecar for rviz -->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="racecar">
+
+  <xacro:property name="wheelbase" value="0.324" />
+  <xacro:property name="width" value="0.145" />
+  <xacro:property name="height" value="0.06" />
+  <xacro:property name="ground_offset" value="0.022" />
+  <xacro:property name="wheel_radius" value="0.05475" />
+  <xacro:property name="wheel_length" value="0.01" />
+  <xacro:property name="laser_height" value="0.1" />
+  <xacro:property name="laser_radius" value="0.02" />
+  <xacro:property name="camera_height" value="0.12" />
+  <xacro:property name="camera_length" value="0.052" />
+  <xacro:property name="car_name" value="racecar" />
+
+  <material name="black">
+    <color rgba="0.2 0.2 0.2 1."/>
+  </material>
+
+  <material name="blue">
+    <color rgba="0.3 0.57 1. 1."/>
+  </material>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 ${ground_offset}"/>
+      <geometry>
+        <box size="${wheelbase} ${width} ${height}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  </link>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint" />
+    <origin xyz="0 0 ${-ground_offset}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_footprint"/>
+
+  
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser"/>
+    <origin xyz="${wheelbase/2} 0 ${(height+laser_height)}"/>
+  </joint>
+
+  <link name="laser">
+    <visual>
+      <geometry>
+        <cylinder radius="${laser_radius}" length="${laser_height}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_left_rear_wheel" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_rear_wheel"/>
+    <origin xyz="${-wheelbase/2} ${(width)/2} ${wheel_radius-ground_offset}"/>
+  </joint>
+
+  <link name="left_rear_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+      </geometry>
+      <material name="black"/>
+      <origin rpy="${pi/2} 0 0"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_right_rear_wheel" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_rear_wheel"/>
+    <origin xyz="${-wheelbase/2} ${-(width)/2} ${wheel_radius-ground_offset}"/>
+  </joint>
+
+  <link name="right_rear_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+      </geometry>
+      <material name="black"/>
+      <origin rpy="${pi/2} 0 0"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_left_steering_hinge" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_steering_hinge"/>
+    <origin xyz="${wheelbase/2} ${(width)/2} ${wheel_radius-ground_offset}"/>
+  </joint>
+
+  <link name="left_steering_hinge"/>
+
+  <joint name="left_steering_hinge_to_wheel" type="continuous">
+    <parent link="left_steering_hinge"/>
+    <child link="left_front_wheel"/>
+  </joint>
+
+  <link name="left_front_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+      </geometry>
+      <material name="black"/>
+      <origin rpy="${pi/2} 0 0"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_right_steering_hinge" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_steering_hinge"/>
+    <origin xyz="${wheelbase/2} ${-(width)/2} ${wheel_radius-ground_offset}"/>
+  </joint>
+
+  <link name="right_steering_hinge"/>
+
+  <joint name="right_steering_hinge_to_wheel" type="continuous">
+    <parent link="right_steering_hinge"/>
+    <child link="right_front_wheel"/>
+  </joint>
+
+  <link name="right_front_wheel">
+    <visual>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
+      </geometry>
+      <material name="black"/>
+      <origin rpy="${pi/2} 0 0"/>
+    </visual>
+  </link>
+
+  <!-- IMU-->
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="${-wheelbase/2} 0 ${height}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="imu_link"/>
+
+  <!-- Camera -->
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${wheelbase/2 + camera_length} 0 ${camera_height-ground_offset}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="camera_link"/>
+
+  <joint name="realsense_camera_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="camera_link"/>
+    <child link="realsense_camera_link"/>
+    <axis xyz="0 0 1" />
+    <!-- <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0" /> -->
+  </joint>
+
+  <!-- realsense camera -->
+  <link name="realsense_camera_link">
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.033 0.175 0.030"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.033 0.175 0.030"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+  </link>
+
+<!-- xacros -->
+
+  <!-- <xacro:include filename="$(find 99p_gym_sim)/urdf/racecar.gazebo" /> -->
+
+</robot>

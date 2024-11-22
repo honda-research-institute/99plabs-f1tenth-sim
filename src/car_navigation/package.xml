@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>car_navigation</name>
+  <version>0.4.7</version>
+  <description>Bringup scripts and configurations for the navigation2 stack</description>
+  <maintainer email="research@99plabs.com">99P Labs</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>nav2_amcl</depend>
+  <depend>nav2_behavior_tree</depend>
+  <depend>nav2_bt_navigator</depend>
+  <depend>nav2_collision_monitor</depend>
+  <depend>nav2_constrained_smoother</depend>
+  <depend>nav2_controller</depend>
+  <depend>nav2_core</depend>
+  <depend>nav2_costmap_2d</depend>
+  <depend>nav2_lifecycle_manager</depend>
+  <depend>nav2_map_server</depend>
+  <depend>nav2_msgs</depend>
+  <depend>nav2_planner</depend>
+  <depend>nav2_behaviors</depend>
+  <depend>nav2_smoother</depend>
+  <depend>nav2_regulated_pure_pursuit_controller</depend>
+  <depend>nav2_mppi_controller</depend>
+  <depend>nav2_smac_planner</depend>
+  <depend>nav2_util</depend>
+  <depend>nav2_velocity_smoother</depend>
+  <depend>nav2_voxel_grid</depend>
+  <depend>nav2_waypoint_follower</depend>
+  <depend>nav2_common</depend>
+  <depend>slam_toolbox</depend>
+  <depend>ackermann_msgs</depend>
+
+  <build_depend>launch_ros</build_depend>
+
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>launch</test_depend>
+  <test_depend>launch_testing</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

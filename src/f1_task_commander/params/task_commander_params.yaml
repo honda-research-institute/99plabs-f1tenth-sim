@@ -1,0 +1,9 @@
+task_commander:
+  ros__parameters:
+    localizer: 'amcl'
+    waypoints_file: 'waypoints.csv'
+    initial_pose_x:  0.85
+    initial_pose_y: 0.85
+    initial_pose_orientation_z: 0.0
+    initial_pose_orientation_w: 0.0
+    timeout_wait: 600.0

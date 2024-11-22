@@ -1,0 +1,10 @@
+autonomous_control:
+  ros__parameters:
+    use_system_deadman: true
+    twist_topic: "/cmd_vel"
+    ackermann_topic: "/drive"
+    joy_topic: "/joy"
+    traffic_light_topic: "/traffic_light"
+    system_deadman_topic: "/system_deadman"
+    wheelbase: 0.324
+    frame_id: 'odom'

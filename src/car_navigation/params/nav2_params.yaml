@@ -1,0 +1,387 @@
+amcl:
+  ros__parameters:
+    use_sim_time: True
+    alpha1: 0.02                       # Odometry model parameter for rotational noise due to rotational motion. Higher values mean more noise, resulting in more spread out particles.
+    alpha2: 0.02                       # Odometry model parameter for rotational noise due to translational motion. Higher values mean more noise, increasing uncertainty in orientation.
+    alpha3: 0.02                       # Odometry model parameter for translational noise due to translational motion. Higher values mean more noise, increasing uncertainty in position.
+    alpha4: 0.02                       # Odometry model parameter for translational noise due to rotational motion. Higher values mean more noise, causing more particle dispersion.
+    alpha5: 0.02                       # Odometry model parameter for translational noise due to combined motion. Higher values mean more noise, increasing overall uncertainty.
+    base_frame_id: "base_link"
+    beam_skip_distance: 0.5           # Distance threshold for skipping beams in beam skipping. Unit: meters. Higher values skip more beams, reducing computation but potentially losing detail.
+    beam_skip_error_threshold: 0.9    # Error threshold for beam skipping. No unit. Higher values allow more error before skipping beams.
+    beam_skip_threshold: 0.3          # Proportion of beams that can be skipped. No unit. Higher values allow skipping more beams, reducing computation but possibly decreasing accuracy.
+    do_beamskip: false                # Enable or disable beam skipping. No unit. If true, enables beam skipping to reduce computation.
+    global_frame_id: "map"
+    lambda_short: 0.1                 # Exponential distribution parameter for short readings. No unit. Higher values increase the probability of short readings, assuming more obstacles are closer.
+    laser_likelihood_max_dist: 2.0    # Maximum distance for considering laser likelihood. Unit: meters. Higher values consider more distant obstacles, potentially increasing computation.
+    laser_max_range: 30.0            # Maximum range of the laser sensor. Unit: meters. Higher values assume the sensor can detect farther distances.
+    laser_min_range: -1.0             # Minimum range of the laser sensor. Unit: meters. Values below zero typically mean to ignore minimum range constraints.
+    laser_model_type: "likelihood_field"  # Type of laser model used. No unit. The likelihood field model is commonly used for its balance of accuracy and computation.
+    max_beams: 512                     # Maximum number of laser beams to consider. No unit. Higher values use more beams, increasing accuracy but also computation.
+    max_particles: 2000               # Maximum number of particles in the filter. No unit. Higher values improve localization accuracy but increase computational load.
+    min_particles: 500                # Minimum number of particles in the filter. No unit. Lower values reduce computational load but may decrease localization accuracy.
+    odom_frame_id: "odom"
+    pf_err: 0.05                      # Error threshold for Kullback-Leibler divergence. No unit. Lower values require more particles for better approximation, increasing computation.
+    pf_z: 0.99                        # Probability threshold for Kullback-Leibler divergence. No unit. Higher values tighten the confidence interval, increasing particle spread.
+    recovery_alpha_fast: 0.0          # Decay rate for short-term average weight filter. No unit. Higher values increase the likelihood of recovering with random particles.
+    recovery_alpha_slow: 0.0          # Decay rate for long-term average weight filter. No unit. Higher values increase the likelihood of recovering with random particles.
+    resample_interval: 1              # Number of filter updates before resampling. No unit. Lower values resample more frequently, increasing computational load.
+    robot_model_type: "nav2_amcl::DifferentialMotionModel"
+    save_pose_rate: 0.5               # Rate at which to save the robot's pose. Unit: Hz. Higher values save the pose more frequently.
+    sigma_hit: 0.2                    # Standard deviation for Gaussian model of measurement noise. No unit. Lower values assume less noise in measurements, increasing confidence.
+    tf_broadcast: true
+    transform_tolerance: 0.05         # Tolerance for transform lookups. Unit: seconds. Higher values allow more delay in transform lookups
+    update_min_a: 0.1                 # Minimum rotational movement before filter update. Unit: radians. Lower values trigger updates more frequently for smaller rotations.
+    update_min_d: 0.1                # Minimum translational movement before filter update. Unit: meters. Lower values trigger updates more frequently for smaller translations. 
+    z_hit: 0.5                        # Weight for the Gaussian model of measurement noise. No unit. Higher values give more confidence to correct measurements.
+    z_max: 0.05                       # Weight for unexpected measurements (max range). No unit. Higher values give more confidence to max range readings, considering more unknown space.
+    z_rand: 0.5                       # Weight for random measurements. No unit. Higher values assume more random noise in the environment.
+    z_short: 0.05                     # Weight for short readings (unexpected obstacles). No unit. Higher values give more confidence to unexpected short readings.
+    scan_topic: scan
+    set_initial_pose: True
+    initial_pose:                     # Initial pose parameters if set_initial_pose is true.
+      x: 0.85                         # Initial x position. Unit: meters. Sets the starting x-coordinate.
+      y: 0.85                         # Initial y position. Unit: meters. Sets the starting y-coordinate.
+      z: 0.0                          # Initial z position. Unit: meters. Typically set to 0 for 2D localization.
+      yaw: 0.0                        # Initial yaw angle. Unit: radians. Sets the starting orientation.
+
+map_server:
+  ros__parameters:
+    use_sim_time: True
+    # Overridden in launch by the "map" launch configuration or provided default value.
+    # To use in yaml, remove the default "map" value in the tb3_simulation_launch.py file & provide full path to map below.
+    yaml_filename: ""
+    
+map_saver:
+  ros__parameters:
+    use_sim_time: True
+    save_map_timeout: 5.0
+    free_thresh_default: 0.25
+    occupied_thresh_default: 0.65
+    map_subscribe_transient_local: True
+  
+robot_state_publisher:
+  ros__parameters:
+    use_sim_time: True
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: True
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: /odom
+    bt_loop_duration: 333 # (1000ms = 1hz) Determines how frequently the behavior tree's root node is ticked (in ms NOT seconds!)
+    default_server_timeout: 20
+    wait_for_service_timeout: 1000
+    default_nav_to_pose_bt_xml: $(find-pkg-share car_navigation)/behavior_tree/nav_to_pose_with_consistent_replanning_and_if_path_becomes_invalid.xml
+    default_nav_through_poses_bt_xml: $(find-pkg-share car_navigation)/behavior_tree/navigate_through_poses_w_replanning_and_recovery.xml
+    # 'default_nav_through_poses_bt_xml' and 'default_nav_to_pose_bt_xml' are use defaults:
+    # nav2_bt_navigator/navigate_to_pose_w_replanning_and_recovery.xml
+    # nav2_bt_navigator/navigate_through_poses_w_replanning_and_recovery.xml
+    # They can be set here or via a RewrittenYaml remap from a parent launch file to Nav2.
+    plugin_lib_names:
+      - nav2_compute_path_to_pose_action_bt_node
+      - nav2_compute_path_through_poses_action_bt_node
+      - nav2_smooth_path_action_bt_node
+      - nav2_follow_path_action_bt_node
+      - nav2_wait_action_bt_node
+      - nav2_assisted_teleop_action_bt_node
+      - nav2_back_up_action_bt_node
+      - nav2_drive_on_heading_bt_node
+      - nav2_clear_costmap_service_bt_node
+      - nav2_is_stuck_condition_bt_node
+      - nav2_goal_reached_condition_bt_node
+      - nav2_goal_updated_condition_bt_node
+      - nav2_globally_updated_goal_condition_bt_node
+      - nav2_is_path_valid_condition_bt_node
+      - nav2_initial_pose_received_condition_bt_node
+      - nav2_reinitialize_global_localization_service_bt_node
+      - nav2_rate_controller_bt_node
+      - nav2_distance_controller_bt_node
+      - nav2_speed_controller_bt_node
+      - nav2_truncate_path_action_bt_node
+      - nav2_truncate_path_local_action_bt_node
+      - nav2_goal_updater_node_bt_node
+      - nav2_recovery_node_bt_node
+      - nav2_pipeline_sequence_bt_node
+      - nav2_round_robin_node_bt_node
+      - nav2_transform_available_condition_bt_node
+      - nav2_time_expired_condition_bt_node
+      - nav2_path_expiring_timer_condition
+      - nav2_distance_traveled_condition_bt_node
+      - nav2_single_trigger_bt_node
+      - nav2_goal_updated_controller_bt_node
+      - nav2_is_battery_low_condition_bt_node
+      - nav2_navigate_through_poses_action_bt_node
+      - nav2_navigate_to_pose_action_bt_node
+      - nav2_remove_passed_goals_action_bt_node
+      - nav2_planner_selector_bt_node
+      - nav2_controller_selector_bt_node
+      - nav2_goal_checker_selector_bt_node
+      - nav2_controller_cancel_bt_node
+      - nav2_path_longer_on_approach_bt_node
+      - nav2_wait_cancel_bt_node
+      - nav2_back_up_cancel_bt_node
+      - nav2_assisted_teleop_cancel_bt_node
+      - nav2_drive_on_heading_cancel_bt_node
+      - nav2_is_battery_charging_condition_bt_node
+
+bt_navigator_navigate_through_poses_rclcpp_node:
+  ros__parameters:
+    use_sim_time: True
+
+bt_navigator_navigate_to_pose_rclcpp_node:
+  ros__parameters:
+    use_sim_time: True
+
+controller_server:
+  ros__parameters:
+    use_sim_time: True
+    controller_frequency: 2.0 # Frequency to run controller (Hz).
+    min_x_velocity_threshold: 0.05 # The controller server filters the velocity portion of the odometry messages received before sending them to the controller plugin. Odometry values below this threshold (in m/s) will be set to 0.0.
+    min_y_velocity_threshold: 0.001 # The controller server filters the velocity portion of the odometry messages received before sending them to the controller plugin. Odometry values below this threshold (in m/s) will be set to 0.0. For non-holonomic robots
+    min_theta_velocity_threshold: 0.1 # The controller server filters the velocity portion of the odometry messages received before sending them to the controller plugin. Odometry values below this threshold (in rad/s) will be set to 0.0.
+    failure_tolerance: 0.3 # Setting it to the special value of -1.0 makes it infinite, 0 to disable, and any positive value for the appropriate timeout.
+    enable_stamped_cmd_vel: False # Whether to use geometry_msgs::msg::Twist or geometry_msgs::msg::TwistStamped velocity data. True uses TwistStamped, false uses Twist.
+    progress_checker_plugin: "progress_checker"
+    goal_checker_plugins: ["goal_checker"]
+    controller_plugins: ["FollowPath"]
+
+    progress_checker:
+      plugin: "nav2_controller::SimpleProgressChecker"
+      required_movement_radius: 0.1 # Minimum amount a robot must move to be progressing to goal (m).
+      movement_time_allowance: 10.0 # Maximum amount of time a robot has to move the minimum radius (s).
+    goal_checker:
+      plugin: "nav2_controller::SimpleGoalChecker"
+      xy_goal_tolerance: 2.0 # Defines the allowable positional error. Larger values result in less precise but faster goal-reaching behavior; smaller values require more precision.
+      yaw_goal_tolerance: 20.0 # Defines the allowable angular error. Larger values allow for more flexibility in orientation; smaller values require precise alignment.
+      stateful: True # Determines if positional and angular checks are stateful. When true, the robot can meet positional and angular goals in any order; when false, it must meet both simultaneously.
+    FollowPath:
+      plugin: nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController
+
+      # Velocity/acceleration limits also have to be adjusted in the velocity smoother
+      desired_linear_vel: 0.5
+      lookahead_dist: 1.0
+      transform_tolerance: 0.05
+
+      # Adaptive lookahead gain
+      use_velocity_scaled_lookahead_dist: false
+      lookahead_time: 2.5
+      min_lookahead_dist: 0.5
+      max_lookahead_dist: 1.5
+
+      # Approach to goal
+      min_approach_linear_velocity: 0.2
+      approach_velocity_scaling_dist: 0.5
+
+      # Collision detector
+      use_collision_detection: true
+      max_allowed_time_to_collision_up_to_carrot: 1.0
+
+      # Curvature velocity penalty
+      use_regulated_linear_velocity_scaling: false
+      regulated_linear_scaling_min_radius: 0.5
+
+      # Cost spaces velocity penalty
+      use_cost_regulated_linear_velocity_scaling: false # Whether to use the regulated features for proximity to obstacles (e.g. slow in close proximity to obstacles).
+      cost_scaling_dist: 0.55
+      cost_scaling_gain: 0.8 # Should be <= 1.0
+      inflation_cost_scaling_factor: 3.0
+
+      # Minimum speed in high cost spaces with high curvature
+      regulated_linear_scaling_min_speed: 0.25
+
+      allow_reversing: true
+      use_rotate_to_heading: false
+      rotate_to_heading_min_angle: 0.7
+
+      # it is only used when rotating to heading (use_rotate_to_heading)
+      # for some reason rotate_to_heading_angular_vel is ignored and robot rotates with
+      # max_angular_accel/10. angular velocity (that's why it is set to higher value)
+      max_angular_accel: 7.0
+      rotate_to_heading_angular_vel: 2.5
+      use_interpolation: true
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      update_frequency: 5.0
+      publish_frequency: 2.0
+      global_frame: odom
+      robot_base_frame: base_link
+      rolling_window: true
+      width: 4
+      height: 4
+      resolution: 0.05
+      footprint: '[ [0.25, 0.17], [0.25, -0.17], [-0.25, -0.17], [-0.25, 0.17] ]' # rectangle w/ 4 points [Top_Right, Bottom_Right, Bottom_Left, Top_Left]
+      #robot_radius: 0.2
+      plugins: ["static_layer", "voxel_layer", "inflation_layer"]
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 0.1
+        inflation_radius: 0.3
+      voxel_layer:
+        plugin: "nav2_costmap_2d::VoxelLayer"
+        enabled: True
+        publish_voxel_map: True
+        origin_z: 0.0
+        z_resolution: 0.05
+        z_voxels: 16
+        max_obstacle_height: 2.0
+        mark_threshold: 0
+        observation_sources: scan
+        scan:
+          topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: True
+      always_send_full_costmap: True
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      global_frame: map
+      robot_base_frame: base_link
+      footprint: '[ [0.25, 0.17], [0.25, -0.17], [-0.25, -0.17], [-0.25, 0.17] ]' # rectangle w/ 4 points [Top_Right, Bottom_Right, Bottom_Left, Top_Left]
+      #robot_radius: 0.2
+      resolution: 0.05
+      track_unknown_space: true
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: True
+        observation_sources: scan
+        scan:
+          topic: /scan
+          max_obstacle_height: 2.0
+          clearing: True
+          marking: True
+          data_type: "LaserScan"
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: True
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 0.1
+        inflation_radius: 0.3
+      always_send_full_costmap: True
+
+planner_server:
+  ros__parameters:
+    expected_planner_frequency: 20.0
+    use_sim_time: True
+    planner_plugins: ["GridBased"]
+    GridBased:
+      # plugin: "nav2_navfn_planner/NavfnPlanner"
+      # tolerance: 0.5
+      # use_astar: false
+      # allow_unknown: true
+      plugin: "nav2_smac_planner/SmacPlannerHybrid"
+      tolerance: 1.0                      # tolerance for planning if unable to reach exact pose, in meters
+      downsample_costmap: false           # whether or not to downsample the map
+      downsampling_factor: 1              # multiplier for the resolution of the costmap layer (e.g. 2 on a 5cm costmap would be 10cm)
+      transform_tolerance: 0.05            # Increased over 3 times the time tolerance to calculate a path, otherwise just close waypoints will produce a path, since it take time to generate a path for large areas
+      allow_unknown: True                 # allow traveling in unknown space
+      max_iterations: -1                  # maximum total iterations to search for before failing (in case unreachable), set to -1 to disable
+      max_on_approach_iterations: 1000    # maximum number of iterations to attempt to reach goal once in tolerance
+      terminal_checking_interval: 5000    # number of iterations between checking if the goal has been cancelled or planner timed out
+      max_planning_time: 20.0             # max time in s for planner to plan, smooth, and upsample. Will scale maximum smoothing and upsampling times based on remaining time after planning.
+      motion_model_for_search: "DUBIN"    # For Hybrid Dubin, Redds-Shepp
+      cost_travel_multiplier: 2.0         # For 2D: Cost multiplier to apply to search to steer away from high cost areas. Larger values will place in the center of aisles more exactly (if non-`FREE` cost potential field exists) but take slightly longer to compute. To optimize for speed, a value of 1.0 is reasonable. A reasonable tradeoff value is 2.0. A value of 0.0 effective disables steering away from obstacles and acts like a naive binary search A*.
+      angle_quantization_bins: 64         # For Hybrid nodes: Number of angle bins for search, must be 1 for 2D node (no angle search)
+      analytic_expansion_ratio: 3.5       # For Hybrid/Lattice nodes: The ratio to attempt analytic expansions during search for final approach.
+      analytic_expansion_max_length: 3.0    # For Hybrid/Lattice nodes: The maximum length of the analytic expansion to be considered valid to prevent unsafe shortcutting (in meters). This should be scaled with minimum turning radius and be no less than 4-5x the minimum radius
+      analytic_expansion_max_cost: true   # For Hybrid/Lattice nodes: The maximum single cost for any part of an analytic expansion to contain and be valid (except when necessary on approach to goal)
+      analytic_expansion_max_cost_override: false  #  For Hybrid/Lattice nodes: Whether or not to override the maximum cost setting if within critical distance to goal (ie probably required)
+      minimum_turning_radius: 0.1        # For Hybrid/Lattice nodes: minimum turning radius in m of path / vehicle
+      reverse_penalty: 1.25                # For Reeds-Shepp model: penalty to apply if motion is reversing, must be => 1
+      change_penalty: 0.0                 # For Hybrid nodes: penalty to apply if motion is changing directions, must be >= 0
+      non_straight_penalty: 1.20          # For Hybrid nodes: penalty to apply if motion is non-straight, must be => 1
+      cost_penalty: 2.2                   # For Hybrid nodes: penalty to apply to higher cost areas when adding into the obstacle map dynamic programming distance expansion heuristic. This drives the robot more towards the center of passages. A value between 1.3 - 3.5 is reasonable.
+      retrospective_penalty: 0.5        # For Hybrid/Lattice nodes: penalty to prefer later maneuvers before earlier along the path. Saves search time since earlier nodes are not expanded until it is necessary. Must be >= 0.0 and <= 1.0
+      rotation_penalty: 5.0               # For Lattice node: Penalty to apply only to pure rotate in place commands when using minimum control sets containing rotate in place primitives. This should always be set sufficiently high to weight against this action unless strictly necessary for obstacle avoidance or there may be frequent discontinuities in the plan where it requests the robot to rotate in place to short-cut an otherwise smooth path for marginal path distance savings.
+      lookup_table_size: 20.0               # For Hybrid nodes: Size of the dubin/reeds-sheep distance window to cache, in meters.
+      cache_obstacle_heuristic: True      # For Hybrid nodes: Cache the obstacle map dynamic programming distance expansion heuristic between subsiquent replannings of the same goal location. Dramatically speeds up replanning performance (40x) if costmap is largely static.  
+      allow_reverse_expansion: False      # For Lattice nodes: Whether to expand state lattice graph in forward primitives or reverse as well, will double the branching factor at each step.   
+      smooth_path: True                   # For Lattice/Hybrid nodes: Whether or not to smooth the path, always true for 2D nodes.
+      debug_visualizations: False                # For Hybrid/Lattice nodes: Whether to publish expansions on the /expansions topic as an array of poses (the orientation has no meaning) and the path's footprints on the /planned_footprints topic. WARNING: heavy to compute and to display, for debug only as it degrades the performance. 
+      smoother:
+        max_iterations: 1000
+        w_smooth: 0.3
+        w_data: 0.2
+        tolerance: 1.0e-10
+        do_refinement: true               # Whether to recursively run the smoother 3 times on the results from prior runs to refine the results further
+
+
+smoother_server:
+  ros__parameters:
+    use_sim_time: True
+    smoother_plugins: ["simple_smoother"]
+    simple_smoother:
+      plugin: "nav2_smoother::SimpleSmoother"
+      tolerance: 1.0e-10
+      max_its: 1000
+      do_refinement: True
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: True
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
+    cycle_frequency: 10.0
+    behavior_plugins: ["backup", "drive_on_heading", "assisted_teleop", "wait"]
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+    drive_on_heading:
+      plugin: "nav2_behaviors/DriveOnHeading"
+    wait:
+      plugin: "nav2_behaviors/Wait"
+    assisted_teleop:
+      plugin: "nav2_behaviors/AssistedTeleop"
+    global_frame: odom
+    robot_base_frame: base_link
+    transform_tolerance: 0.05
+    simulate_ahead_time: 2.0
+    max_rotational_vel: 1.0
+    min_rotational_vel: 0.4
+    rotational_acc_lim: 3.2
+
+waypoint_follower:
+  ros__parameters:
+    use_sim_time: True
+    loop_rate: 20
+    stop_on_failure: false
+    waypoint_task_executor_plugin: "wait_at_waypoint"
+    wait_at_waypoint:
+      plugin: "nav2_waypoint_follower::WaitAtWaypoint"
+      enabled: True
+      waypoint_pause_duration: 0
+
+velocity_smoother:
+  ros__parameters:
+    use_sim_time: True
+    smoothing_frequency: 20.0
+    scale_velocities: False
+    feedback: "OPEN_LOOP"
+    max_velocity: [1.0, 0.0, 1.0]
+    min_velocity: [-1.0, 0.0, -1.0]
+    max_accel: [2.5, 0.0, 3.2]
+    max_decel: [-2.5, 0.0, -3.2]
+    odom_topic: "odom"
+    odom_duration: 0.1
+    deadband_velocity: [0.0, 0.0, 0.0]
+    velocity_timeout: 1.0

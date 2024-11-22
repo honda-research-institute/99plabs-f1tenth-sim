@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>f110_description</name>
+  <version>0.0.0</version>
+  <description>The racecar_description package</description>
+
+  <maintainer email="research@99plabs.com">99P Labs</maintainer>
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>TODO</license>
+  
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>xacro</depend>
+  
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
