@@ -44,4 +44,4 @@ docker compose up -d
     * Set a navigation goal using the `Nav2 Goal` button for a single goal or the `Waypoints / Nav Through Poses Mode` button for multiple goals.
 
 # License
-The SOMEThings Project is released under the [MIT License](https://opensource.org/license/MIT).
+The SOMEThings Project is released under this [License](LICENSE.pdf).
